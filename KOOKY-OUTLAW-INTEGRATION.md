@@ -1,7 +1,7 @@
 # kooky-outlaw Integration
 
-> **Status:** ✅ Phase 1 implemented — 2026-03-07
-> **Live at:** `doppio.kookyos.com/ai-feed`
+> **Status:** ✅ Phase 2 implemented — 2026-03-07 (Doppio2)
+> **Live at:** `doppio2.vercel.app` (full integration — Learn.tsx + AI feed)
 
 ---
 
@@ -17,9 +17,10 @@ kooky-outlaw (Hostinger VPS, Docker)
     │ 3. qwen2.5:7b ranks top 3 per level (9 total)
     │ 4. POSTs each video to Supabase (service role key)
     ▼
-Supabase youtube_ai_videos table (tqknjbjvdkipszyghfgj)
+Supabase d2_youtube_ai_videos table (tqknjbjvdkipszyghfgj)
     ▼
-Doppio /ai-feed page — reads today's rows on load
+Doppio2 /learn page — reads today's rows on load (with static fallback)
+Doppio2 /ai-feed page — secondary browse view
 ```
 
 ---
@@ -126,7 +127,7 @@ LEVEL 2 rules — must show Claude's computer use or agentic capabilities specif
 LEVEL 3 rules — must show a complete workflow from raw input to polished output (receipts → expense report, research → dashboard), tools can include Claude AND/OR Perplexity, prefer Anthropic or Perplexity official channels, demonstrates multi-step chaining of tools.
 
 After selecting 3 videos per level (9 total), save each one to Supabase by making a POST request to:
-https://SUPABASE_REF.supabase.co/rest/v1/youtube_ai_videos
+https://SUPABASE_REF.supabase.co/rest/v1/d2_youtube_ai_videos
 
 Headers:
   apikey: SUPABASE_SERVICE_ROLE_KEY
@@ -135,12 +136,17 @@ Headers:
   Prefer: return=minimal
 
 Body for each video (one POST per video):
-{"level": LEVEL_NUMBER, "rank": RANK_WITHIN_LEVEL, "title": "VIDEO_TITLE", "channel": "CHANNEL_NAME", "url": "https://youtube.com/watch?v=VIDEO_ID", "reason": "One sentence: why this video helps a non-technical person at this level"}
+{"level": LEVEL_NUMBER, "rank": RANK_WITHIN_LEVEL, "title": "VIDEO_TITLE", "channel": "CHANNEL_NAME", "url": "https://youtube.com/watch?v=VIDEO_ID", "video_id": "VIDEO_ID", "reason": "One sentence: why this video helps a non-technical person at this level", "ai_tool": "AI_TOOL"}
+
+Where:
+- VIDEO_ID is the 11-character YouTube video ID extracted from the URL (e.g. from https://youtube.com/watch?v=dQw4w9WgXcQ the video_id is dQw4w9WgXcQ)
+- AI_TOOL is: "chatgpt" for level 1, "claude" for level 2, "perplexity" for level 3
 
 Post all 9 videos. Confirm each POST returns HTTP 201 before proceeding to the next. Log a summary when done.
 ```
 
 Replace `SUPABASE_REF` with `tqknjbjvdkipszyghfgj`.
+Replace `SUPABASE_SERVICE_ROLE_KEY` with the service role key (stored in 1Password: "Doppio Service Role Key").
 
 ---
 
@@ -168,8 +174,9 @@ The heartbeat system has a mismatch — `engine.py` uses `task.get('run', '')` a
 
 | Feature | What | Status |
 |---------|------|--------|
-| **Live content in /learn** | `fetchTodaysVideos()` replaces `content.json` in `Learn.tsx` | Planned |
+| **Live content in /learn** | `fetchTodaysVideos()` replaces `content.json` in `Learn.tsx` | ✅ Done (Doppio2) |
+| **d2_ table isolation** | Doppio2 uses `d2_*` tables — Doppio untouched | ✅ Done |
+| **HEARTBEAT.md fix** | One-line engine.py fix to make scheduled runs reliable | ✅ Done |
 | **Daily Vercel cron** | Trigger gateway automatically at 06:00 UTC via `vercel.json` cron | Planned |
 | **Personalized coaching** | After card completion, user can ask bot a question (Qwen, zero API cost) | Planned |
-| **HEARTBEAT.md fix** | One-line engine.py fix to make scheduled runs reliable | Planned (kooky-outlaw repo) |
 | **Proactive follow-up** | Bot messages user on Telegram 24h after Doppio completion | Future |

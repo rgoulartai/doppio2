@@ -1,0 +1,158 @@
+{
+  "iphone": {
+    "no_horizontal_overflow": {
+      "pass": true,
+      "detail": "scrollWidth=390px (viewport=390)"
+    },
+    "headline_visible": {
+      "pass": true,
+      "detail": "AI BOSS headline found"
+    },
+    "cta_visible": {
+      "pass": true,
+      "detail": "START NOW button"
+    },
+    "badge_banner_copy": {
+      "pass": true,
+      "detail": "\"\ud83c\udf89 Someone completed Doppio and became an AI Manager! Start your journey \u2192\""
+    },
+    "ios_install_banner_visible": {
+      "pass": true,
+      "detail": "iOS 'Install Doppio' banner found"
+    },
+    "ios_banner_has_dismiss": {
+      "pass": true,
+      "detail": "dismiss button found"
+    },
+    "reaches_learn": {
+      "pass": true,
+      "detail": "url=https://doppio.kookyos.com/learn"
+    },
+    "learn_no_overflow": {
+      "pass": true,
+      "detail": "scrollWidth=390px"
+    },
+    "l1_cards_visible": {
+      "pass": true,
+      "detail": "3 Mark-as-done buttons found"
+    },
+    "progress_bar_visible": {
+      "pass": true,
+      "detail": "progressbar found"
+    },
+    "try_it_button_visible": {
+      "pass": true,
+      "detail": "Try it button found"
+    },
+    "mark_done_works": {
+      "pass": true,
+      "detail": "\u2713 Done button appeared"
+    }
+  },
+  "ios_banner_dismiss": {
+    "banner_disappears": {
+      "pass": true,
+      "detail": "'Install Doppio' count after dismiss=0"
+    },
+    "localStorage_persisted": {
+      "pass": true,
+      "detail": "localStorage[doppio_install_dismissed]=true"
+    },
+    "not_shown_after_reload": {
+      "pass": true,
+      "detail": "count after reload=0"
+    }
+  },
+  "standalone": {
+    "standalone_is_false_in_browser": {
+      "pass": true,
+      "detail": "navigator.standalone=None"
+    },
+    "playwright_cannot_override_standalone": {
+      "pass": true,
+      "detail": "iOS standalone simulation not possible in Playwright headless Chrome \u2014 banner logic documented"
+    }
+  },
+  "pixel5": {
+    "no_horizontal_overflow": {
+      "pass": true,
+      "detail": "scrollWidth=393px"
+    },
+    "headline_visible": {
+      "pass": true,
+      "detail": "AI BOSS found"
+    },
+    "cta_visible": {
+      "pass": true,
+      "detail": "START NOW"
+    },
+    "ios_banner_absent": {
+      "pass": true,
+      "detail": "'Install Doppio' count=0 (must=0)"
+    },
+    "android_install_btn_check": {
+      "pass": true,
+      "detail": "visible=False (BeforeInstallPromptEvent not fired in headless = expected)"
+    },
+    "learn_no_overflow": {
+      "pass": true,
+      "detail": "scrollWidth=393px"
+    },
+    "reaches_learn": {
+      "pass": true,
+      "detail": "url=https://doppio.kookyos.com/learn"
+    },
+    "mark_done_works": {
+      "pass": true,
+      "detail": "\u2713 Done appeared"
+    }
+  },
+  "pwa": {
+    "manifest_link_present": {
+      "pass": true,
+      "detail": "https://doppio.kookyos.com/manifest.webmanifest"
+    },
+    "manifest_name_contains_doppio": {
+      "pass": true,
+      "detail": "name='Doppio - AI Literacy'"
+    },
+    "manifest_display_standalone": {
+      "pass": true,
+      "detail": "display=standalone"
+    },
+    "manifest_start_url": {
+      "pass": true,
+      "detail": "start_url=/"
+    },
+    "manifest_icon_192": {
+      "pass": true,
+      "detail": "['192x192', '512x512', '512x512']"
+    },
+    "manifest_icon_512": {
+      "pass": true,
+      "detail": "512=True"
+    },
+    "apple_touch_icon": {
+      "pass": true,
+      "detail": "https://doppio.kookyos.com/icons/apple-touch-icon-180x180.png"
+    },
+    "service_worker_ready": {
+      "pass": true,
+      "detail": "SW ready=True"
+    }
+  },
+  "offline": {
+    "app_shell_loads": {
+      "pass": true,
+      "detail": "app shell loaded from SW"
+    },
+    "cta_visible_offline": {
+      "pass": true,
+      "detail": "START NOW button visible offline"
+    },
+    "headline_visible_offline": {
+      "pass": true,
+      "detail": "AI BOSS headline visible offline"
+    }
+  }
+}

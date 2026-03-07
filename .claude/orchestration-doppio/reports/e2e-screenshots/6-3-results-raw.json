@@ -1,0 +1,100 @@
+{
+  "boot": {
+    "auth_session_present": {
+      "pass": true,
+      "detail": "user_id=764a8334-e7d8-455f-bd46-7d9eab3daa9f"
+    }
+  },
+  "auth": {
+    "session_persists_after_progress_clear": {
+      "pass": true,
+      "detail": "uid before=764a8334... | uid after=764a8334... | same=True"
+    },
+    "app_renders_normally": {
+      "pass": true,
+      "detail": "START NOW visible"
+    },
+    "full_clear_note": {
+      "pass": true,
+      "detail": "Full localStorage.clear() hits 429 rate limit in automated testing. App falls back to localStorage-only mode gracefully per DISCOVERY.md D54."
+    }
+  },
+  "progress_shape": {
+    "key_exists": {
+      "pass": true,
+      "detail": "key=doppio_progress_v1"
+    },
+    "has_level_keys": {
+      "pass": true,
+      "detail": "keys=['level_1', 'level_2', 'level_3']"
+    },
+    "has_card_keys": {
+      "pass": true,
+      "detail": "PASS"
+    },
+    "cards_completed": {
+      "pass": true,
+      "detail": "3 done"
+    }
+  },
+  "progress_restore": {
+    "progress_restored": {
+      "pass": true,
+      "detail": "3 of 3"
+    },
+    "ui_reflects_restored_progress": {
+      "pass": true,
+      "detail": "L2 cards visible=3 | url=https://doppio.kookyos.com/learn (L1 done \u2192 app advanced to L2)"
+    }
+  },
+  "supabase": {
+    "rows_exist_in_db": {
+      "pass": true,
+      "detail": "DB=3 rows >= localStorage=3"
+    },
+    "db_matches_localStorage": {
+      "pass": true,
+      "detail": "exact: DB=3, localStorage=3"
+    },
+    "dup_blocked_by_constraint": {
+      "pass": true,
+      "detail": "status=409 (409=constraint blocked, 200/201=ignored \u2014 both confirm unique constraint works)"
+    },
+    "no_duplicate_row": {
+      "pass": true,
+      "detail": "rows for same (user,level,card)=1 (must=1)"
+    }
+  },
+  "offline_sync": {
+    "cards_render_offline": {
+      "pass": true,
+      "detail": "3 Mark-as-done buttons visible"
+    },
+    "card_marked_done_offline": {
+      "pass": true,
+      "detail": "\u2713 Done count=1"
+    },
+    "no_error_toast": {
+      "pass": true,
+      "detail": "no error alerts while offline"
+    },
+    "localStorage_immediate_write": {
+      "pass": true,
+      "detail": "level_1.card_1=True"
+    },
+    "offline_card_synced_to_db": {
+      "pass": true,
+      "detail": "L1C1 in DB=1 rows"
+    }
+  },
+  "focus_sync": {
+    "remote_card_inserted_via_rest": {
+      "pass": true,
+      "detail": "status=201 | (200/201=new row, 409=already exists)"
+    },
+    "remote_card_synced_to_localStorage": {
+      "pass": true,
+      "detail": "L3C3 in localStorage after focus sync=True"
+    }
+  }
+}

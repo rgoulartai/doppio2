@@ -1,0 +1,236 @@
+{
+  "levels": [
+    {
+      "level": 1,
+      "title": "Beginner",
+      "emoji": "🌱",
+      "subtitle": "ChatGPT beyond search — everyday tasks with natural language",
+      "aiToolLabel": "ChatGPT",
+      "cards": [
+        {
+          "id": "l1c1",
+          "level": 1,
+          "card": 1,
+          "title": "Plan my groceries from a receipt photo",
+          "description": "Watch someone upload a grocery receipt photo and get a full 3-day meal plan with a shopping list for missing ingredients.",
+          "platform": "youtube",
+          "videoId": "yo42ayzL41U",
+          "creator": "Skill Leap AI",
+          "creatorUrl": "https://www.youtube.com/@SkillLeapAI",
+          "aiTool": "chatgpt",
+          "tryItPrompt": "I have a photo of my grocery receipt. Analyze what I bought, suggest a 3-day meal plan using those ingredients, and list what extra I might need.",
+          "tryItUrl": "https://chatgpt.com/?q=I+have+a+photo+of+my+grocery+receipt.+Analyze+what+I+bought%2C+suggest+a+3-day+meal+plan+using+those+ingredients%2C+and+list+what+extra+I+might+need.",
+          "copyPrompt": "I have a photo of my grocery receipt. Analyze what I bought, suggest a 3-day meal plan using those ingredients, and list what extra I might need."
+        },
+        {
+          "id": "l1c2",
+          "level": 1,
+          "card": 2,
+          "title": "How to use ChatGPT to summarize a PDF (2026 Full Guide)",
+          "description": "See ChatGPT read a 20-page work document and return exactly 5 bullet points covering everything that matters.",
+          "platform": "youtube",
+          "videoId": "9qwacTcHbTw",
+          "creator": "Tutorials With Alex",
+          "creatorUrl": "https://www.youtube.com/@TutorialsWithAlex",
+          "aiTool": "chatgpt",
+          "tryItPrompt": "I'm going to paste a document. Please summarize it into exactly 5 bullet points covering the key takeaways.",
+          "tryItUrl": "https://chatgpt.com/?q=I%27m+going+to+paste+a+document.+Please+summarize+it+into+exactly+5+bullet+points+covering+the+key+takeaways.",
+          "copyPrompt": "I'm going to paste a document. Please summarize it into exactly 5 bullet points covering the key takeaways."
+        },
+        {
+          "id": "l1c3",
+          "level": 1,
+          "card": 3,
+          "title": "Write a professional email declining a meeting",
+          "description": "Watch ChatGPT draft a polished, friendly decline email in under 10 seconds from a simple one-line request.",
+          "platform": "youtube",
+          "videoId": "MFuvf3JxEQ0",
+          "creator": "Matt Wolfe",
+          "creatorUrl": "https://www.youtube.com/@mreflow",
+          "aiTool": "chatgpt",
+          "tryItPrompt": "Write a professional but friendly email declining a meeting invite. Make it respectful and suggest an alternative time or approach.",
+          "tryItUrl": "https://chatgpt.com/?q=Write+a+professional+but+friendly+email+declining+a+meeting+invite.+Make+it+respectful+and+suggest+an+alternative+time+or+approach.",
+          "copyPrompt": "Write a professional but friendly email declining a meeting invite. Make it respectful and suggest an alternative time or approach."
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "title": "Intermediate",
+      "emoji": "⚡",
+      "subtitle": "Simple AI delegation — Claude handles file and browser tasks for you",
+      "aiToolLabel": "Claude",
+      "cards": [
+        {
+          "id": "l2c1",
+          "level": 2,
+          "card": 1,
+          "title": "Clean up my Downloads folder",
+          "description": "Watch Claude organize a chaotic Downloads folder by file type, create subfolders, and move everything into place — no manual sorting.",
+          "platform": "youtube",
+          "videoId": "d6iawCYuuEE",
+          "creator": "Anthropic",
+          "creatorUrl": "https://www.youtube.com/@anthropic-ai",
+          "aiTool": "claude",
+          "tryItPrompt": "Please organize my Downloads folder by grouping files by type, creating subfolders, and moving files into the right place. Ask before deleting anything.",
+          "tryItUrl": "https://claude.ai/new?q=Please+organize+my+Downloads+folder+by+grouping+files+by+type%2C+creating+subfolders%2C+and+moving+files+into+the+right+place.+Ask+before+deleting+anything.",
+          "copyPrompt": "Please organize my Downloads folder by grouping files by type, creating subfolders, and moving files into the right place. Ask before deleting anything."
+        },
+        {
+          "id": "l2c2",
+          "level": 2,
+          "card": 2,
+          "title": "Book a restaurant for tonight",
+          "description": "See Claude browse the web, find an Italian restaurant with tonight availability, and complete the booking — start to finish.",
+          "platform": "youtube",
+          "videoId": "rBJnWMD0Pho",
+          "creator": "Anthropic",
+          "creatorUrl": "https://www.youtube.com/@anthropic-ai",
+          "aiTool": "claude",
+          "tryItPrompt": "Find a well-reviewed Italian restaurant near me that has availability tonight for 2 people at 7:30 PM and book it. Show me the options before confirming.",
+          "tryItUrl": "https://claude.ai/new?q=Find+a+well-reviewed+Italian+restaurant+near+me+that+has+availability+tonight+for+2+people+at+7%3A30+PM+and+book+it.+Show+me+the+options+before+confirming.",
+          "copyPrompt": "Find a well-reviewed Italian restaurant near me that has availability tonight for 2 people at 7:30 PM and book it. Show me the options before confirming."
+        },
+        {
+          "id": "l2c3",
+          "level": 2,
+          "card": 3,
+          "title": "Fill out this expense form for me",
+          "description": "Watch Claude open a web form, read the fields, and fill in all the details from shared receipts — one command, whole form done.",
+          "platform": "youtube",
+          "videoId": "jqx18KgIzAE",
+          "creator": "Anthropic",
+          "creatorUrl": "https://www.youtube.com/@anthropic-ai",
+          "aiTool": "claude",
+          "tryItPrompt": "I need to fill out a form online. Here's the URL and my information. Please open the form, fill in my details, and show me a preview before submitting.",
+          "tryItUrl": "https://claude.ai/new?q=I+need+to+fill+out+a+form+online.+Here%27s+the+URL+and+my+information.+Please+open+the+form%2C+fill+in+my+details%2C+and+show+me+a+preview+before+submitting.",
+          "copyPrompt": "I need to fill out a form online. Here's the URL and my information. Please open the form, fill in my details, and show me a preview before submitting."
+        }
+      ]
+    },
+    {
+      "level": 3,
+      "title": "Advanced",
+      "emoji": "🚀",
+      "subtitle": "Full AI agents — multi-step workflows from raw inputs to polished outputs",
+      "aiToolLabel": "Claude & Perplexity",
+      "cards": [
+        {
+          "id": "l3c1",
+          "level": 3,
+          "card": 1,
+          "title": "Turn my receipts into an expense report",
+          "description": "Watch Claude read a pile of receipt photos, extract dates, vendors, and amounts, then produce a formatted expense report ready to submit.",
+          "platform": "youtube",
+          "videoId": "UAmKyyZ-b9E",
+          "creator": "Anthropic",
+          "creatorUrl": "https://www.youtube.com/@anthropic-ai",
+          "aiTool": "claude",
+          "tryItPrompt": "I have photos of work trip receipts. Please extract the date, vendor, amount, and category from each one and create a formatted expense report I can submit.",
+          "tryItUrl": "https://claude.ai/new?q=I+have+photos+of+work+trip+receipts.+Please+extract+the+date%2C+vendor%2C+amount%2C+and+category+from+each+one+and+create+a+formatted+expense+report+I+can+submit.",
+          "copyPrompt": "I have photos of work trip receipts. Please extract the date, vendor, amount, and category from each one and create a formatted expense report I can submit."
+        },
+        {
+          "id": "l3c2",
+          "level": 3,
+          "card": 2,
+          "title": "Research the top trends and build a summary dashboard",
+          "description": "See Perplexity pull live sources, synthesize the top 3 remote-work trends, and produce a one-page summary dashboard with citations.",
+          "platform": "youtube",
+          "videoId": "Z1_M2XtsUwY",
+          "creator": "Perplexity AI",
+          "creatorUrl": "https://www.youtube.com/@PerplexityAI",
+          "aiTool": "perplexity",
+          "tryItPrompt": "Research the top 3 trends in remote work for 2025, find what experts and employees are saying, and build me a one-page summary dashboard with sources.",
+          "tryItUrl": "https://www.perplexity.ai/?q=Research+the+top+3+trends+in+remote+work+for+2025%2C+find+what+experts+and+employees+are+saying%2C+and+build+me+a+one-page+summary+with+sources.",
+          "copyPrompt": "Research the top 3 trends in remote work for 2025, find what experts and employees are saying, and build me a one-page summary dashboard with sources."
+        },
+        {
+          "id": "l3c3",
+          "level": 3,
+          "card": 3,
+          "title": "Find the best flights and compare them in a table",
+          "description": "Watch an AI agent search live flight data across multiple routes and return a clean comparison table — price, duration, layovers — in one shot.",
+          "platform": "youtube",
+          "videoId": "YeldJ4UezDQ",
+          "creator": "Perplexity AI",
+          "creatorUrl": "https://www.youtube.com/@PerplexityAI",
+          "aiTool": "perplexity",
+          "tryItPrompt": "Find the best flights from NYC to Tokyo in April under $1200 and compare them in a table showing price, total duration, number of stops, and airline.",
+          "tryItUrl": "https://www.perplexity.ai/?q=Find+the+best+flights+from+NYC+to+Tokyo+in+April+under+%241200+and+compare+them+in+a+table+showing+price%2C+total+duration%2C+stops%2C+and+airline.",
+          "copyPrompt": "Find the best flights from NYC to Tokyo in April under $1200 and compare them in a table showing price, total duration, number of stops, and airline."
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "title": "Skill Leap AI",
+      "url": "https://www.youtube.com/@SkillLeapAI",
+      "description": "Practical AI tutorials for non-technical office workers — new demos every week.",
+      "emoji": "🎓"
+    },
+    {
+      "title": "Anthropic on YouTube",
+      "url": "https://www.youtube.com/@anthropic-ai",
+      "description": "Official Claude demos including computer use and multi-step agent workflows.",
+      "emoji": "🤖"
+    },
+    {
+      "title": "The Rundown AI",
+      "url": "https://www.youtube.com/@TheRundownAI",
+      "description": "Weekly coverage of the best new AI tools with hands-on workflow demos.",
+      "emoji": "📰"
+    },
+    {
+      "title": "Perplexity AI on YouTube",
+      "url": "https://www.youtube.com/@PerplexityAI",
+      "description": "Official Perplexity tutorials showing research synthesis and agentic workflows.",
+      "emoji": "🔍"
+    },
+    {
+      "title": "Matt Wolfe",
+      "url": "https://www.youtube.com/@mreflow",
+      "description": "The go-to channel for discovering new AI tools explained for everyday users.",
+      "emoji": "🌐"
+    }
+  ],
+  "backups": [
+    {
+      "forCard": "l1c1",
+      "videoId": "OeiUhUudygE",
+      "platform": "youtube",
+      "notes": "ChatGPT meal plan with prompts (SmartWorkAI) — alternate to primary fridge photo demo"
+    },
+    {
+      "forCard": "l1c3",
+      "videoId": "KDs_vTx9hLY",
+      "platform": "youtube",
+      "notes": "How to AUTO-REPLY to emails using ChatGPT (Tips For Noobs, 1m42s) — shorter alternate to primary"
+    },
+    {
+      "forCard": "l2c1",
+      "videoId": "vH2f7cjXjKI",
+      "platform": "youtube",
+      "notes": "Claude computer use for coding (Anthropic official, 3m4s) — Anthropic official alternate to primary"
+    },
+    {
+      "forCard": "l2c2",
+      "videoId": "5KTHvKCrQ00",
+      "platform": "youtube",
+      "notes": "Claude ran a business in our office (Anthropic, 6m) — extended Anthropic demo alternate"
+    },
+    {
+      "forCard": "l3c1",
+      "videoId": "LpGpwhORWr0",
+      "platform": "youtube",
+      "notes": "Claude works with slides, spreadsheets, and contract redlines (Anthropic, 1m39s) — alternate workflow demo"
+    },
+    {
+      "forCard": "l3c2",
+      "videoId": "edbKMwddwBU",
+      "platform": "youtube",
+      "notes": "Perplexity Beginner to Pro in 27 Minutes (Ali H. Salem) — comprehensive Perplexity intro alternate"
+    }
+  ]
+}

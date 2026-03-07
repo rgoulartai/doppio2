@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+dev-dist/
+
+# Environment variables — NEVER commit these
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Vercel
+.vercel/
+
+# Editor
+.vscode/
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+
+# Playwright MCP screenshots and regression artifacts
+.playwright-mcp/
+*-landing.png
+*-production-*.png
+
+# macOS
+.DS_Store
+
+# Obsidian internals
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+
+# Timeline auto-updater runtime files
+scripts/.last_run
+scripts/update_timeline.log
+scripts/auto_commit_push.log
+scripts/budget_screenshot.log
+scripts/budget_auth.json
+*.tmp
+.vercel

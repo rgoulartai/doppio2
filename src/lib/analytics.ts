@@ -17,7 +17,7 @@ export async function track(
   properties: Record<string, unknown> = {}
 ): Promise<void> {
   try {
-    await supabase.from('analytics_events').insert({
+    await supabase.from('d2_analytics_events').insert({
       event_name: eventName,
       session_id: getSessionId(),
       properties,

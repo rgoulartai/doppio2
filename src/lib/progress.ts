@@ -4,8 +4,8 @@ import { getOrCreateAnonUser } from './auth';
 import { track } from './analytics';
 import content from '../data/content.json';
 
-const PROGRESS_KEY = 'doppio_progress_v2';
-const MEDALS_KEY = 'doppio_medals_v1';
+const PROGRESS_KEY = 'doppio2_progress_v1';
+const MEDALS_KEY = 'doppio2_medals_v1';
 
 export type MedalTier = 'bronze' | 'silver' | 'gold' | null;
 
@@ -137,7 +137,7 @@ export function markCardComplete(level: 1 | 2 | 3, card: 1 | 2 | 3): void {
       const user = await getOrCreateAnonUser();
       if (!user) return;
       const { error } = await supabase
-        .from('user_progress')
+        .from('d2_user_progress')
         .upsert(
           { user_id: user.id, level, card, completed_at: new Date().toISOString() },
           { onConflict: 'user_id,level,card', ignoreDuplicates: true }
@@ -162,7 +162,7 @@ export async function syncFromSupabase(): Promise<void> {
     todayStart.setHours(0, 0, 0, 0);
 
     const { data, error } = await supabase
-      .from('user_progress')
+      .from('d2_user_progress')
       .select('level, card')
       .eq('user_id', user.id)
       .gte('completed_at', todayStart.toISOString());

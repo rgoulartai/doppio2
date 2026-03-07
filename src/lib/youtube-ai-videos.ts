@@ -8,13 +8,15 @@ export interface AIVideo {
   title: string
   channel: string
   url: string
+  video_id: string
   reason: string
+  ai_tool: string
 }
 
 export async function fetchTodaysVideos(): Promise<AIVideo[]> {
   const today = new Date().toISOString().split('T')[0]
   const { data, error } = await supabase
-    .from('youtube_ai_videos')
+    .from('d2_youtube_ai_videos')
     .select('*')
     .eq('session_date', today)
     .order('level', { ascending: true })

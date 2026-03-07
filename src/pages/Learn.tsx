@@ -1,15 +1,46 @@
 // src/pages/Learn.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import content from '../data/content.json';
+import staticContent from '../data/content.json';
+import { fetchTodaysVideos, type AIVideo } from '../lib/youtube-ai-videos';
 import { useProgress } from '../hooks/useProgress';
 import { getMedalTier, medalRank, type ProgressState, type MedalTier } from '../lib/progress';
-import type { Level } from '../types/content';
+import type { Level, VideoCard } from '../types/content';
 import { LevelHeader } from '../components/LevelHeader';
 import { LevelNav } from '../components/LevelNav';
 import { CardList } from '../components/CardList';
 import { ProgressBar } from '../components/ProgressBar';
 import { LevelCompleteScreen } from '../components/LevelCompleteScreen';
+
+// Static level metadata — titles, emojis, subtitles don't come from the AI feed
+const LEVEL_META: Record<1 | 2 | 3, { title: string; emoji: string; subtitle: string; aiToolLabel: string }> = {
+  1: { title: 'Beginner', emoji: '🌱', subtitle: 'ChatGPT for everyday tasks', aiToolLabel: 'ChatGPT' },
+  2: { title: 'Intermediate', emoji: '⚡', subtitle: 'Delegate tasks to Claude', aiToolLabel: 'Claude' },
+  3: { title: 'Advanced', emoji: '🚀', subtitle: 'Full AI workflows with Perplexity', aiToolLabel: 'Perplexity' },
+};
+
+function buildLevelsFromAIVideos(videos: AIVideo[]): Level[] {
+  return ([1, 2, 3] as const).map((lvl) => {
+    const meta = LEVEL_META[lvl];
+    const levelVideos = videos.filter((v) => v.level === lvl).sort((a, b) => a.rank - b.rank);
+    const cards: VideoCard[] = levelVideos.map((v) => ({
+      id: `l${v.level}c${v.rank}`,
+      level: v.level,
+      card: v.rank as 1 | 2 | 3,
+      title: v.title,
+      description: v.reason,
+      platform: 'youtube',
+      videoId: v.video_id,
+      creator: v.channel,
+      creatorUrl: v.url,
+      aiTool: v.ai_tool as 'chatgpt' | 'claude' | 'perplexity',
+      tryItPrompt: '',
+      tryItUrl: '',
+      copyPrompt: '',
+    }));
+    return { level: lvl, ...meta, cards };
+  });
+}
 
 export default function Learn() {
   const [searchParams] = useSearchParams();
@@ -22,12 +53,25 @@ export default function Learn() {
     awardedMedalTier,
   } = useProgress();
 
+  const [levels, setLevels] = useState<Level[]>(staticContent.levels as Level[]);
+  const [contentSource, setContentSource] = useState<'ai' | 'static'>('static');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTodaysVideos().then((videos) => {
+      if (videos.length === 9) {
+        setLevels(buildLevelsFromAIVideos(videos));
+        setContentSource('ai');
+      }
+      setLoading(false);
+    });
+  }, []);
+
   const getInitialLevel = (): 1 | 2 | 3 => {
     const param = searchParams.get('level');
     if (param === '1' || param === '2' || param === '3') {
       return parseInt(param) as 1 | 2 | 3;
     }
-    // First incomplete level
     for (const n of [1, 2, 3] as const) {
       const levelKey = `level_${n}` as keyof ProgressState;
       const allDone = Object.values(progress[levelKey]).every(Boolean);
@@ -48,19 +92,17 @@ export default function Learn() {
   const handleCardComplete = (level: 1 | 2 | 3, card: 1 | 2 | 3) => {
     markComplete(level, card);
 
-    // Compute the updated level progress manually (React state update is async)
     const levelKey = `level_${level}` as keyof ProgressState;
     const updatedLevel = { ...progress[levelKey], [`card_${card}`]: true } as Record<string, boolean>;
     const allDone = [1, 2, 3].every((c) => updatedLevel[`card_${c}`]);
 
     if (allDone) {
-      // Check if a new medal tier is reached
       const updatedProgress: ProgressState = { ...progress, [levelKey]: updatedLevel };
       const newTier = getMedalTier(updatedProgress);
       const newMedal = medalRank(newTier) > medalRank(awardedMedalTier) ? newTier : null;
 
       if (newMedal) {
-        awardMedal(newMedal); // record lifetime count + mark today's awarded tier
+        awardMedal(newMedal);
       }
 
       setShowLevelComplete({ level, medal: newMedal });
@@ -75,7 +117,15 @@ export default function Learn() {
     }
   };
 
-  const currentLevel = content.levels.find((l) => l.level === activeLevel) as Level | undefined;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-apple-bg text-apple-text flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#0071e3] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const currentLevel = levels.find((l) => l.level === activeLevel) as Level | undefined;
   if (!currentLevel) return null;
 
   const currentLevelProgress = progress[`level_${activeLevel}` as keyof ProgressState];
@@ -83,13 +133,17 @@ export default function Learn() {
   return (
     <div className="min-h-screen bg-apple-bg text-apple-text flex flex-col">
       <LevelHeader totalCompleted={totalCompleted} todayMedalTier={todayMedalTier} />
+      {contentSource === 'ai' && (
+        <div className="w-full max-w-lg lg:max-w-5xl mx-auto px-4 pt-2">
+          <p className="text-xs text-[#0071e3] font-medium">✦ Today's AI-curated picks</p>
+        </div>
+      )}
       <LevelNav
         activeLevel={activeLevel}
         completedCounts={completedCounts}
         onSelectLevel={setActiveLevel}
       />
 
-      {/* Progress dots + label */}
       <div className="w-full max-w-lg lg:max-w-5xl mx-auto px-4 pt-4 pb-1">
         <ProgressBar
           completedCards={completedCounts[activeLevel]}
@@ -97,7 +151,6 @@ export default function Learn() {
         />
       </div>
 
-      {/* key={activeLevel} triggers remount → slide-from-right animation fires on every tab switch */}
       <main key={activeLevel} className="flex-1 overflow-y-auto">
         <CardList
           level={currentLevel}
@@ -119,7 +172,7 @@ export default function Learn() {
 }
 
 async function handleShare() {
-  const SHARE_URL = 'https://doppio.kookyos.com/?ref=badge';
+  const SHARE_URL = 'https://doppio2.kookyos.com/?ref=badge';
   const shareData = {
     title: "I'm now an AI Manager!",
     text: "I just completed a Doppio level — the Duolingo of AI. Try it in 20 minutes:",

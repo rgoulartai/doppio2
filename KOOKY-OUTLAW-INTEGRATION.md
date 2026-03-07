@@ -1,27 +1,35 @@
 # kooky-outlaw Integration
 
-> **Status:** ✅ Phase 2 implemented — 2026-03-07 (Doppio2)
+> **Status:** ✅ Phase 2 fully working — 2026-03-07 (Doppio2)
 > **Live at:** `doppio2.vercel.app` (full integration — Learn.tsx + AI feed)
+> **Pipeline:** `doppio_curate.py` produces 9 rows across all 3 levels, confirmed live
 
 ---
 
 ## What's Built
 
 ```
-kooky-outlaw (Hostinger VPS, Docker)
-  LLM: qwen2.5:7b via Ollama on RunPod (Tailscale 100.90.24.91)
-  HTTP Gateway: port 8080, POST /webhook
+doppio_curate.py (runs inside kooky-outlaw container on Hostinger VPS)
     │
-    │ 1. Bot receives prompt via gateway
-    │ 2. Calls YouTube Data API (3 searches × 15 results)
-    │ 3. qwen2.5:7b ranks top 3 per level (9 total)
-    │ 4. POSTs each video to Supabase (service role key)
+    ├── Phase A: YouTube fetch — direct Python HTTP call to YouTube Data API
+    │     3 queries × 15 results = up to 45 candidate videos
+    │
+    ├── Phase B: LLM curation — 3 messages to kooky-outlaw HTTP gateway
+    │     Each message: "From this list, pick best 3. Return 3 JSON objects."
+    │     LLM: llama3.1:8b via Ollama on RunPod (Tailscale 100.90.24.91)
+    │
+    └── Phase C: Supabase write — direct Python HTTP POST (no LLM for writing)
+          9 rows → d2_youtube_ai_videos (level 1-3, rank 1-3)
     ▼
 Supabase d2_youtube_ai_videos table (tqknjbjvdkipszyghfgj)
     ▼
 Doppio2 /learn page — reads today's rows on load (with static fallback)
 Doppio2 /ai-feed page — secondary browse view
 ```
+
+**Key design decision:** YouTube fetching and Supabase POSTing are done directly in Python.
+The LLM is only used for curation (picking best 3 and writing a reason). This sidesteps
+LLM output format inconsistencies for structured data operations.
 
 ---
 
@@ -58,22 +66,34 @@ cd /opt/kooky-outlaw && docker compose logs -f
 
 **Status:** ✅ Applied to production (project `tqknjbjvdkipszyghfgj`)
 
+The active table is `d2_youtube_ai_videos` (Doppio2-specific, `d2_` prefix isolates from original Doppio).
+
 ```sql
-create table public.youtube_ai_videos (
+-- Migration: supabase/migrations/003_doppio2_tables.sql
+create table public.d2_youtube_ai_videos (
   id           uuid default gen_random_uuid() primary key,
-  session_date date not null default current_date,
+  session_date date not null,            -- ⚠️ NOT NULL, no default yet — must be in POST body
   fetched_at   timestamptz not null default now(),
   level        smallint not null check (level between 1 and 3),
   rank         smallint not null,
   title        text not null,
-  channel      text not null,
+  channel      text not null default '',
   url          text not null,
-  reason       text not null
+  video_id     text not null,            -- 11-char YouTube ID
+  reason       text not null default '',
+  ai_tool      text not null default ''  -- 'chatgpt' | 'claude' | 'perplexity'
 );
 -- Public read (anon key), bot writes via service role key (bypasses RLS)
 ```
 
-Migration file: `supabase/migrations/002_youtube_ai_videos.sql`
+> **Note:** `session_date` has no `DEFAULT CURRENT_DATE` yet. Migration `004_session_date_default.sql`
+> exists locally but has not been applied (no `supabase/config.toml` for `supabase db push`).
+> The workaround — passing `session_date` explicitly in every POST — is already in `doppio_curate.py`.
+
+Migration files:
+- `supabase/migrations/002_youtube_ai_videos.sql` — original Doppio table (not used by Doppio2)
+- `supabase/migrations/003_doppio2_tables.sql` — `d2_youtube_ai_videos` schema
+- `supabase/migrations/004_session_date_default.sql` — pending: adds `DEFAULT CURRENT_DATE`
 
 ---
 
@@ -81,72 +101,64 @@ Migration file: `supabase/migrations/002_youtube_ai_videos.sql`
 
 ### Credentials needed
 
-| Credential | Where |
-|-----------|-------|
-| `YOUTUBE_API_KEY` | Google Cloud Console → APIs → YouTube Data API v3 |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase Dashboard → doppio project → Settings → API |
-| `GATEWAY_SECRET` | 1Password — "Doppio Gateway Secret" |
+All credentials are already hardcoded in `doppio_curate.py` on the VPS.
+No manual substitution needed.
 
-### The curl command
+| Credential | Location in script | 1Password backup |
+|-----------|-------------------|-----------------|
+| `YOUTUBE_API_KEY` | `YOUTUBE_API_KEY` constant | "YouTube Data API Key" |
+| `SUPABASE_SERVICE_ROLE_KEY` | `SUPABASE_KEY` constant | "Doppio Service Role Key" |
+| `GATEWAY_SECRET` | `GATEWAY_SECRET` constant | "Doppio Gateway Secret" |
+
+### Running the pipeline
 
 ```bash
-curl -X POST http://100.94.51.9:8080/webhook \
-  -H "Content-Type: application/json" \
-  -H "X-Gateway-Secret: GATEWAY_SECRET" \
-  -d '{
-    "sender_id": "doppio-cron",
-    "content": "FULL_PROMPT_BELOW"
-  }'
+# SSH to VPS
+ssh -i ~/.ssh/id_ed25519 root@100.94.51.9
+
+# Run inside the container
+docker exec kooky-outlaw python3 /app/doppio_curate.py
 ```
 
-### The prompt (replace placeholders before sending)
-
+Expected output (successful run):
 ```
-You are curating daily YouTube videos for Doppio, an AI literacy app for non-technical users.
+Doppio curation — 2026-03-07 20:11:48
+  seven_days_ago: 2026-02-28T00:00:00Z
+  cleared N history rows
 
-Search YouTube for recent AI videos using the YouTube Data API. Make three separate searches:
-
-SEARCH 1 — Level 1 Beginner (ChatGPT everyday tasks):
-URL: https://www.googleapis.com/youtube/v3/search?part=snippet&q=chatgpt+tutorial+beginners+everyday+tasks&type=video&order=viewCount&publishedAfter=SEVEN_DAYS_AGO&maxResults=15&key=YOUTUBE_API_KEY
-
-SEARCH 2 — Level 2 Intermediate (Claude computer use / delegation):
-URL: https://www.googleapis.com/youtube/v3/search?part=snippet&q=claude+computer+use+agentic+tasks&type=video&order=viewCount&publishedAfter=SEVEN_DAYS_AGO&maxResults=15&key=YOUTUBE_API_KEY
-
-SEARCH 3 — Level 3 Advanced (AI workflows, Claude + Perplexity):
-URL: https://www.googleapis.com/youtube/v3/search?part=snippet&q=claude+perplexity+AI+workflow+automation&type=video&order=viewCount&publishedAfter=SEVEN_DAYS_AGO&maxResults=15&key=YOUTUBE_API_KEY
-
-Replace SEVEN_DAYS_AGO with the ISO 8601 date 7 days ago (e.g. 2026-03-01T00:00:00Z).
-Replace YOUTUBE_API_KEY with the actual key.
-
-For each search, select the 3 best videos:
-
-LEVEL 1 rules — must show ChatGPT doing a task on screen (not just talking about it), task must be instantly recognizable to an office worker (meal planning, summarizing a doc, writing an email), no coding or developer content, prefer channels: Skill Leap AI, The Rundown AI, Matt Wolfe, under 10 minutes.
-
-LEVEL 2 rules — must show Claude's computer use or agentic capabilities specifically, video must demonstrate handing off a multi-step job (organizing files, booking something, filling a form), prefer Anthropic's official YouTube channel, no coding tutorials.
-
-LEVEL 3 rules — must show a complete workflow from raw input to polished output (receipts → expense report, research → dashboard), tools can include Claude AND/OR Perplexity, prefer Anthropic or Perplexity official channels, demonstrates multi-step chaining of tools.
-
-After selecting 3 videos per level (9 total), save each one to Supabase by making a POST request to:
-https://SUPABASE_REF.supabase.co/rest/v1/d2_youtube_ai_videos
-
-Headers:
-  apikey: SUPABASE_SERVICE_ROLE_KEY
-  Authorization: Bearer SUPABASE_SERVICE_ROLE_KEY
-  Content-Type: application/json
-  Prefer: return=minimal
-
-Body for each video (one POST per video):
-{"level": LEVEL_NUMBER, "rank": RANK_WITHIN_LEVEL, "title": "VIDEO_TITLE", "channel": "CHANNEL_NAME", "url": "https://youtube.com/watch?v=VIDEO_ID", "video_id": "VIDEO_ID", "reason": "One sentence: why this video helps a non-technical person at this level", "ai_tool": "AI_TOOL"}
-
-Where:
-- VIDEO_ID is the 11-character YouTube video ID extracted from the URL (e.g. from https://youtube.com/watch?v=dQw4w9WgXcQ the video_id is dQw4w9WgXcQ)
-- AI_TOOL is: "chatgpt" for level 1, "claude" for level 2, "perplexity" for level 3
-
-Post all 9 videos. Confirm each POST returns HTTP 201 before proceeding to the next. Log a summary when done.
+────────────────────────────────────────────────────────────
+  Level 1: ChatGPT for beginners
+  Fetching YouTube results...
+  Found 15 videos
+  Asking LLM to curate...
+  queued as message NNNN
+  waiting for LLM.......... done (Xs)
+  LLM picked 3 videos
+  Posting to Supabase...
+    POST rank 1: HTTP 201 — <title>
+    POST rank 2: HTTP 201 — <title>
+    POST rank 3: HTTP 201 — <title>
+  [... repeat for Level 2, Level 3 ...]
+────────────────────────────────────────────────────────────
+  Curation complete! Posted 9 rows to d2_youtube_ai_videos.
 ```
 
-Replace `SUPABASE_REF` with `tqknjbjvdkipszyghfgj`.
-Replace `SUPABASE_SERVICE_ROLE_KEY` with the service role key (stored in 1Password: "Doppio Service Role Key").
+### Deploying script updates
+
+`src/` is **baked into the Docker image** at build time — NOT volume-mounted.
+To update any Python file, use `docker cp`:
+
+```bash
+# 1. SCP file to VPS host
+scp -i ~/.ssh/id_ed25519 scripts/doppio_curate.py root@100.94.51.9:/opt/kooky-outlaw/scripts/doppio_curate.py
+
+# 2. Copy into running container
+docker cp /opt/kooky-outlaw/scripts/doppio_curate.py kooky-outlaw:/app/doppio_curate.py
+
+# 3. No restart needed for script-only changes (doppio_curate.py runs as a one-shot exec)
+# For engine.py or other src/ changes, restart is required:
+docker compose -f /opt/kooky-outlaw/docker-compose.yml restart kooky-outlaw
+```
 
 ---
 
@@ -160,13 +172,62 @@ The gateway is fire-and-forget (async). For the demo:
 
 ---
 
+## Pipeline Engineering Notes
+
+These are hard-won debugging findings from getting the pipeline to 100%.
+
+### YouTube API: `publishedAfter` + `order=viewCount` returns 0 items
+
+The combination `publishedAfter=<date>&order=viewCount` consistently returns `pageInfo.resultsPerPage: 0`
+even when `totalResults` is 500+. This is a YouTube Data API quirk — results exist but aren't served.
+
+**Fix in `doppio_curate.py`:** Drop `publishedAfter` from the YouTube fetch URL entirely.
+The `order=viewCount` filter is sufficient to surface recent, relevant content.
+
+```python
+# ❌ Broken (returns 0 items)
+url = f"...&order=viewCount&publishedAfter={SEVEN_DAYS_AGO}&maxResults=15..."
+
+# ✅ Works
+url = f"...&order=viewCount&maxResults=15..."
+```
+
+### LLM output format for tool calls is inconsistent
+
+`llama3.1:8b` inconsistently formats tool call output. Observed variants:
+- Native `tool_calls` in JSON (works perfectly)
+- ` ```json\n{...}``` ` fenced blocks (caught by post-loop interceptor)
+- `{"name": ...}` bare JSON (caught by bare JSON scanner)
+- `{\n  "name": ...}` pretty-printed (fixed in `engine.py` — regex `\{[\s]*"name"`)
+- `1. {"name": ..., "body": "{"nested": ...}"}` — outer `}` missing due to deep nesting
+
+The last variant (missing outer `}` in deeply nested JSON) was the root cause of Supabase POSTs failing.
+**Fix:** Supabase POSTs are now done directly in Python — the LLM is only asked for simple JSON objects
+(no nested `body` field), eliminating the nesting depth that caused the formatting failure.
+
+### `docker cp` is required for deployments
+
+`src/` is baked into the Docker image at build time — it is NOT volume-mounted. `scp` to the VPS host
+updates host files but NOT the running container. Always use:
+```bash
+docker cp <local-file> kooky-outlaw:<container-path>
+```
+
+### Conversation history timing: count only assistant messages
+
+`doppio_curate.py` polls `conversation_history` to detect when the LLM has responded.
+The engine saves the **user message** to history before the LLM runs, which causes a false positive.
+**Fix:** `db_count()` filters `WHERE role='assistant'` — only increments after the LLM responds.
+
+---
+
 ## ⚠️ Known Issue: HEARTBEAT.md Parser Bug
 
 The heartbeat system has a mismatch — `engine.py` uses `task.get('run', '')` and `task.get('purpose', '')` for the LLM prompt, but the parser only populates `instructions`. Result: heartbeat tasks fire with nearly empty prompts.
 
 **Fix:** one-line change in `kooky-outlaw/src/kookyoutlaw/core/engine.py` — use `task.get('instructions', '')` instead of `task.get('run', '')`. Lives in the kooky-outlaw repo.
 
-**For now:** use the HTTP gateway (above) — it receives the full prompt exactly as written.
+**For now:** use `doppio_curate.py` directly (via `docker exec`) — it fully controls the prompt.
 
 ---
 
@@ -177,6 +238,8 @@ The heartbeat system has a mismatch — `engine.py` uses `task.get('run', '')` a
 | **Live content in /learn** | `fetchTodaysVideos()` replaces `content.json` in `Learn.tsx` | ✅ Done (Doppio2) |
 | **d2_ table isolation** | Doppio2 uses `d2_*` tables — Doppio untouched | ✅ Done |
 | **HEARTBEAT.md fix** | One-line engine.py fix to make scheduled runs reliable | ✅ Done |
-| **Daily Vercel cron** | Trigger gateway automatically at 06:00 UTC via `vercel.json` cron | Planned |
+| **doppio_curate.py pipeline** | 9 rows across all 3 levels, 100% reliable | ✅ Done (2026-03-07) |
+| **Daily Vercel cron** | Trigger `docker exec kooky-outlaw python3 /app/doppio_curate.py` at 06:00 UTC | Planned |
+| **`session_date` default** | Apply `004_session_date_default.sql` to add `DEFAULT CURRENT_DATE` | Planned |
 | **Personalized coaching** | After card completion, user can ask bot a question (Qwen, zero API cost) | Planned |
 | **Proactive follow-up** | Bot messages user on Telegram 24h after Doppio completion | Future |

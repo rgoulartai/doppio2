@@ -105,5 +105,24 @@ Categories: `Planning` | `Research` | `Architecture` | `Content` | `Dev` | `Depl
 
 **[~16:15] Deploy** — Feature branch `feature/kooky-outlaw-youtube-feed` merged to `main` and pushed — build passes (126 modules, 0 TS errors)
 
+**[~19:05–20:15] Infra** — `doppio_curate.py` pipeline debugging and full rewrite — root causes identified and fixed:
+  - YouTube API: `publishedAfter` + `order=viewCount` returns 0 items — removed date filter
+  - `docker cp` required for container deployments (not SCP to host — `src/` is baked into image)
+  - `session_date NOT NULL` constraint — workaround: include field in every POST body
+  - Engine bare JSON scanner: regex `\{[\s]*"name"` replaces `str.find('{"name"')` to handle pretty-printed JSON
+  - LLM generates malformed nested JSON (missing outer `}`) — moved Supabase POSTs to direct Python
+  - `db_count()` false-positive on user message — changed to count only `role='assistant'` rows
+  - LLM returns single JSON object instead of array — changed prompt to ask for 3 objects on separate lines
+
+**[~20:15] Dev** — `doppio_curate.py` rewritten with 3-phase architecture:
+  Phase A: direct Python YouTube API fetch (no LLM)
+  Phase B: LLM curation per level — 3 JSON objects on separate lines
+  Phase C: direct Python Supabase POST (no LLM)
+  Result: **9 rows confirmed in `d2_youtube_ai_videos`** across all 3 levels (✅ L1 chatgpt, ✅ L2 claude, ✅ L3 perplexity)
+
+**[~20:15] Dev** — `engine.py` bare JSON scanner improved: `\{[\s]*"name"` regex handles compact and pretty-printed JSON tool call formats
+
+**[~20:15] Deploy** — Both files deployed to container via `docker cp`; changes committed to `kooky-outlaw` main (commit `d087681`)
+
 ---
 <!-- Auto-commits will append entries above this line -->

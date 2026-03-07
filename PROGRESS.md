@@ -198,7 +198,16 @@ These require user action (agent cannot complete autonomously):
 | Build passes | ✅ done | `npm run build` — 126 modules, 0 TS errors |
 | Merged + pushed to main | ✅ done | Branch `feature/kooky-outlaw-youtube-feed` |
 
-**Next:** Obtain `YOUTUBE_API_KEY` + `SUPABASE_SERVICE_ROLE_KEY` → fire gateway curl → verify 9 rows in Supabase → reload `/ai-feed`
+**Status (2026-03-07 20:15):** Pipeline fully working. 9 rows live in Supabase.
+
+| Item | Status | Notes |
+|------|--------|-------|
+| `supabase/migrations/003_doppio2_tables.sql` | ✅ done | `d2_youtube_ai_videos` table + RLS applied |
+| `supabase/migrations/004_session_date_default.sql` | ⏸️ pending | Adds `DEFAULT CURRENT_DATE`; workaround in place |
+| `doppio_curate.py` v2 — 3-phase rewrite | ✅ done | Direct YouTube fetch + LLM curate + direct POST |
+| 9 rows in Supabase (all 3 levels) | ✅ confirmed | L1 chatgpt ✅, L2 claude ✅, L3 perplexity ✅ |
+| `engine.py` bare JSON scanner fix | ✅ done | Regex handles pretty-printed JSON |
+| Daily automation (cron) | ⏸️ planned | `docker exec kooky-outlaw python3 /app/doppio_curate.py` |
 
 ---
 
@@ -206,4 +215,4 @@ These require user action (agent cannot complete autonomously):
 
 | Blocker | Type | Status | Resolution |
 |---------|------|--------|------------|
-| YouTube API key needed | credential | open | User must create key in Google Cloud Console → YouTube Data API v3 |
+| YouTube API key needed | credential | ✅ resolved | Key already in `doppio_curate.py` on VPS |

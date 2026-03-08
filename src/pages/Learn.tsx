@@ -65,14 +65,13 @@ export default function Learn() {
   } = useProgress();
 
   const [levels, setLevels] = useState<Level[]>(staticContent.levels as Level[]);
-  const [contentSource, setContentSource] = useState<'ai' | 'static'>('static');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchTodaysVideos().then((videos) => {
       if (videos.length === 9) {
         setLevels(buildLevelsFromAIVideos(videos));
-        setContentSource('ai');
+
       }
       setLoading(false);
     });

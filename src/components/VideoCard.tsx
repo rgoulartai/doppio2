@@ -97,9 +97,14 @@ export function VideoCard({ card, isCompleted, onComplete }: VideoCardProps) {
 
       {/* Card body */}
       <div className="p-4 space-y-3">
-        <h3 className="font-semibold text-apple-text text-[15px] leading-snug tracking-tight">
-          {card.title}
-        </h3>
+        <div>
+          <h3 className="font-semibold text-apple-text text-[15px] leading-snug tracking-tight">
+            {card.title.split('|')[0].trim()}
+          </h3>
+          {card.creator && (
+            <p className="text-[13px] text-apple-secondary mt-0.5">{card.creator}</p>
+          )}
+        </div>
 
         <button
           onClick={onComplete}

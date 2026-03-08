@@ -19,25 +19,36 @@ const LEVEL_META: Record<1 | 2 | 3, { title: string; emoji: string; subtitle: st
   3: { title: 'Advanced', emoji: '🚀', subtitle: 'Full AI workflows with Perplexity', aiToolLabel: 'Perplexity' },
 };
 
+const TOOL_BASE_URLS: Record<string, string> = {
+  chatgpt: 'https://chatgpt.com/',
+  claude: 'https://claude.ai/new',
+  perplexity: 'https://www.perplexity.ai/',
+};
+
 function buildLevelsFromAIVideos(videos: AIVideo[]): Level[] {
   return ([1, 2, 3] as const).map((lvl) => {
     const meta = LEVEL_META[lvl];
     const levelVideos = videos.filter((v) => v.level === lvl).sort((a, b) => a.rank - b.rank);
-    const cards: VideoCard[] = levelVideos.map((v) => ({
-      id: `l${v.level}c${v.rank}`,
-      level: v.level,
-      card: v.rank as 1 | 2 | 3,
-      title: v.title,
-      description: v.reason,
-      platform: 'youtube',
-      videoId: v.video_id,
-      creator: v.channel,
-      creatorUrl: v.url,
-      aiTool: v.ai_tool as 'chatgpt' | 'claude' | 'perplexity',
-      tryItPrompt: '',
-      tryItUrl: '',
-      copyPrompt: '',
-    }));
+    const cards: VideoCard[] = levelVideos.map((v) => {
+      const prompt = v.try_it_prompt || v.reason || `Help me apply what I learned from: ${v.title}`;
+      const baseUrl = TOOL_BASE_URLS[v.ai_tool?.toLowerCase()] ?? 'https://chatgpt.com/';
+      const tryItUrl = `${baseUrl}?q=${encodeURIComponent(prompt)}`;
+      return {
+        id: `l${v.level}c${v.rank}`,
+        level: v.level,
+        card: v.rank as 1 | 2 | 3,
+        title: v.title,
+        description: v.reason,
+        platform: 'youtube',
+        videoId: v.video_id,
+        creator: v.channel,
+        creatorUrl: v.url,
+        aiTool: v.ai_tool as 'chatgpt' | 'claude' | 'perplexity',
+        tryItPrompt: prompt,
+        tryItUrl,
+        copyPrompt: prompt,
+      };
+    });
     return { level: lvl, ...meta, cards };
   });
 }
@@ -133,11 +144,6 @@ export default function Learn() {
   return (
     <div className="min-h-screen bg-apple-bg text-apple-text flex flex-col">
       <LevelHeader totalCompleted={totalCompleted} todayMedalTier={todayMedalTier} />
-      {contentSource === 'ai' && (
-        <div className="w-full max-w-lg lg:max-w-5xl mx-auto px-4 pt-2">
-          <p className="text-xs text-[#0071e3] font-medium">✦ Today's AI-curated picks</p>
-        </div>
-      )}
       <LevelNav
         activeLevel={activeLevel}
         completedCounts={completedCounts}

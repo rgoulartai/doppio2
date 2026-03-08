@@ -11,6 +11,7 @@ export interface AIVideo {
   video_id: string
   reason: string
   ai_tool: string
+  try_it_prompt: string
 }
 
 export async function fetchTodaysVideos(): Promise<AIVideo[]> {
